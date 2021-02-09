@@ -7,6 +7,7 @@ module.exports = {
     name: "verify",
     description: "Prototype Command",
     run: async (client, message, args) => {
+
         //Data From Rover's API
         var data = await http(`https://verify.eryn.io/api/user/${message.author.id}`)
         data = await data.json()
@@ -15,21 +16,56 @@ module.exports = {
 
         //Roles
         async function roleManager(groupId, robloxId) {
-            const isInGroup = await nbx.getRankInGroup(groupId, robloxId, ) != 0
+            const isInGroup = await nbx.getRankInGroup(groupId, robloxId) != 0
             if (isInGroup) {
                 const rankName = await nbx.getRankNameInGroup(groupId, robloxId)
                 const guild = message.guild
 
                 var role = guild.roles.cache.find(r => r.name == rankName);
-                message.member.roles.remove(message.member.roles.cache)
+
+                GuildMember.roles.remove(GuildMember.roles.cache)
                 try {
-                    await message.member.roles.add(role)
+                    await GuildMember.roles.add(role)
                 } catch (err) {
                     message.channel.send("I am unable to find a role to give.")
                 }
+
+                //Apply Departmental Roles
+                if (await nbx.getRankInGroup(config.robloxGroups.AD, robloxId) != 0) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'AD')) // Administrative Department
+                }
+
+                if (await nbx.getRankInGroup(config.robloxGroups.MTF, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MTF')) // Mobile Task Forces
+                }
+
+                if (await nbx.getRankInGroup(config.robloxGroups.ScD, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'ScD')) // Scientific Department
+                }     
+                
+                if (await nbx.getRankInGroup(config.robloxGroups.EC, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'EC')) // Ethics Committee
+                }  
+
+                if (await nbx.getRankInGroup(config.robloxGroups.SD, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'SD')) // Security Department
+                }  
+
+                if (await nbx.getRankInGroup(config.robloxGroups.MD, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MD')) // Medical Department
+                }  
+
+                if (await nbx.getRankInGroup(config.robloxGroups.DEA, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'DEA')) // Department of External Affairs
+                }  
+
+                if (await nbx.getRankInGroup(config.robloxGroups.MaD, robloxId) != 0 ) {
+                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MaD')) // Manufacturing Department
+                }  
+
             } else {
-                message.member.roles.remove(message.member.roles.cache)
-                message.member.roles.add(r => r.name == 'Class D')
+                GuildMember.roles.remove(GuildMember.roles.cache)
+                GuildMember.roles.add(r => r.name == 'Class D')
             }
         }
 
