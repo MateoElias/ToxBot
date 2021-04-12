@@ -1,6 +1,6 @@
 const http = require('node-fetch')
 const nbx = require('noblox.js')
-const { MessageEmbed } = require('discord.js')
+const Discord = require('discord.js')
 const config = require('../../config.json')
 
 module.exports = {
@@ -12,7 +12,7 @@ module.exports = {
         var data = await http(`https://verify.eryn.io/api/user/${message.author.id}`)
         data = await data.json()
         // Message
-        const botMessage = new MessageEmbed
+        const botMessage = new Discord.MessageEmbed()
 
         //Roles
         async function roleManager(groupId, robloxId) {
