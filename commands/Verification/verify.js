@@ -1,6 +1,9 @@
 const http = require('node-fetch')
-const nbx = require('noblox.js')
-const Discord = require('discord.js')
+const noblox = require('noblox.js')
+const {
+    MessageEmbed,
+    GuildMember
+} = require('discord.js')
 const config = require('../../config.json')
 
 module.exports = {
@@ -12,13 +15,13 @@ module.exports = {
         var data = await http(`https://verify.eryn.io/api/user/${message.author.id}`)
         data = await data.json()
         // Message
-        const botMessage = new Discord.MessageEmbed()
+        const botMessage = new MessageEmbed
 
         //Roles
         async function roleManager(groupId, robloxId) {
-            const isInGroup = await nbx.getRankInGroup(groupId, robloxId) != 0
+            const isInGroup = await noblox.getRankInGroup(groupId, robloxId) != 0
             if (isInGroup) {
-                const rankName = await nbx.getRankNameInGroup(groupId, robloxId)
+                const rankName = await noblox.getRankNameInGroup(groupId, robloxId)
                 const guild = message.guild
 
                 var role = guild.roles.cache.find(r => r.name == rankName);
@@ -30,38 +33,13 @@ module.exports = {
                     message.channel.send("I am unable to find a role to give.")
                 }
 
-                //Apply Departmental Roles
-                if (await nbx.getRankInGroup(config.robloxGroups.AD, robloxId) != 0) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'AD')) // Administrative Department
+                for await (group of config.robloxGroups) {
+                    if (await noblox.getRankInGroup(group.id, robloxId) != 0) {
+                        if (group.id && group.name) {
+                            GuildMember.roles.add(guild.roles.cache.find(r => r.name == group.name))
+                        }
+                    }
                 }
-
-                if (await nbx.getRankInGroup(config.robloxGroups.MTF, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MTF')) // Mobile Task Forces
-                }
-
-                if (await nbx.getRankInGroup(config.robloxGroups.ScD, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'ScD')) // Scientific Department
-                }     
-                
-                if (await nbx.getRankInGroup(config.robloxGroups.EC, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'EC')) // Ethics Committee
-                }  
-
-                if (await nbx.getRankInGroup(config.robloxGroups.SD, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'SD')) // Security Department
-                }  
-
-                if (await nbx.getRankInGroup(config.robloxGroups.MD, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MD')) // Medical Department
-                }  
-
-                if (await nbx.getRankInGroup(config.robloxGroups.DEA, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'DEA')) // Department of External Affairs
-                }  
-
-                if (await nbx.getRankInGroup(config.robloxGroups.MaD, robloxId) != 0 ) {
-                    GuildMember.roles.add(guild.roles.cache.find(r => r.name == 'MaD')) // Manufacturing Department
-                }  
 
             } else {
                 GuildMember.roles.remove(GuildMember.roles.cache)
@@ -84,7 +62,7 @@ module.exports = {
                 message.channel.send(botMessage)
             }
 
-            roleManager(config.robloxGroups.mainGroup, data.robloxId)
+            roleManager(config.robloxGroups[0].id, data.robloxId)
 
         } else {
             switch (data.errorCode) {
